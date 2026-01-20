@@ -9,9 +9,17 @@ export default function ChatInterface({
   conversation,
   onSendMessage,
   isLoading,
+  sharedSecret,
+  onSharedSecretChange,
 }) {
   const [input, setInput] = useState('');
+  const [secretInput, setSecretInput] = useState(sharedSecret || '');
   const messagesEndRef = useRef(null);
+
+  // Update secret when prop changes
+  useEffect(() => {
+    setSecretInput(sharedSecret || '');
+  }, [sharedSecret]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -24,6 +32,10 @@ export default function ChatInterface({
   const handleSubmit = (e) => {
     e.preventDefault();
     if (input.trim() && !isLoading) {
+      // Update shared secret before sending
+      if (secretInput.trim()) {
+        onSharedSecretChange(secretInput.trim());
+      }
       onSendMessage(input);
       setInput('');
     }
@@ -122,15 +134,25 @@ export default function ChatInterface({
 
       {conversation.messages.length === 0 && (
         <form className="input-form" onSubmit={handleSubmit}>
-          <textarea
-            className="message-input"
-            placeholder="Ask your question... (Shift+Enter for new line, Enter to send)"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={handleKeyDown}
-            disabled={isLoading}
-            rows={3}
-          />
+          <div className="input-fields">
+            <input
+              type="password"
+              className="secret-input"
+              placeholder="Shared Secret (required for API access)"
+              value={secretInput}
+              onChange={(e) => setSecretInput(e.target.value)}
+              disabled={isLoading}
+            />
+            <textarea
+              className="message-input"
+              placeholder="Ask your question... (Shift+Enter for new line, Enter to send)"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={handleKeyDown}
+              disabled={isLoading}
+              rows={3}
+            />
+          </div>
           <button
             type="submit"
             className="send-button"

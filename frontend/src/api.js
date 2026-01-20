@@ -3,15 +3,14 @@
  */
 
 const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:8001';
-const SHARED_SECRET = import.meta.env.VITE_SHARED_SECRET || '';
 
 // Helper function to get headers with shared secret
-function getHeaders() {
+function getHeaders(sharedSecret) {
   const headers = {
     'Content-Type': 'application/json',
   };
-  if (SHARED_SECRET) {
-    headers['X-Shared-Secret'] = SHARED_SECRET;
+  if (sharedSecret) {
+    headers['X-Shared-Secret'] = sharedSecret;
   }
   return headers;
 }
@@ -19,10 +18,11 @@ function getHeaders() {
 export const api = {
   /**
    * List all conversations.
+   * @param {string} sharedSecret - Optional shared secret for authentication
    */
-  async listConversations() {
+  async listConversations(sharedSecret = null) {
     const response = await fetch(`${API_BASE}/api/conversations`, {
-      headers: getHeaders(),
+      headers: getHeaders(sharedSecret),
     });
     if (!response.ok) {
       throw new Error('Failed to list conversations');
@@ -32,11 +32,12 @@ export const api = {
 
   /**
    * Create a new conversation.
+   * @param {string} sharedSecret - Optional shared secret for authentication
    */
-  async createConversation() {
+  async createConversation(sharedSecret = null) {
     const response = await fetch(`${API_BASE}/api/conversations`, {
       method: 'POST',
-      headers: getHeaders(),
+      headers: getHeaders(sharedSecret),
       body: JSON.stringify({}),
     });
     if (!response.ok) {
@@ -47,12 +48,14 @@ export const api = {
 
   /**
    * Get a specific conversation.
+   * @param {string} conversationId - The conversation ID
+   * @param {string} sharedSecret - Optional shared secret for authentication
    */
-  async getConversation(conversationId) {
+  async getConversation(conversationId, sharedSecret = null) {
     const response = await fetch(
       `${API_BASE}/api/conversations/${conversationId}`,
       {
-        headers: getHeaders(),
+        headers: getHeaders(sharedSecret),
       }
     );
     if (!response.ok) {
@@ -63,13 +66,16 @@ export const api = {
 
   /**
    * Send a message in a conversation.
+   * @param {string} conversationId - The conversation ID
+   * @param {string} content - The message content
+   * @param {string} sharedSecret - Optional shared secret for authentication
    */
-  async sendMessage(conversationId, content) {
+  async sendMessage(conversationId, content, sharedSecret = null) {
     const response = await fetch(
       `${API_BASE}/api/conversations/${conversationId}/message`,
       {
         method: 'POST',
-        headers: getHeaders(),
+        headers: getHeaders(sharedSecret),
         body: JSON.stringify({ content }),
       }
     );
@@ -84,14 +90,15 @@ export const api = {
    * @param {string} conversationId - The conversation ID
    * @param {string} content - The message content
    * @param {function} onEvent - Callback function for each event: (eventType, data) => void
+   * @param {string} sharedSecret - Optional shared secret for authentication
    * @returns {Promise<void>}
    */
-  async sendMessageStream(conversationId, content, onEvent) {
+  async sendMessageStream(conversationId, content, onEvent, sharedSecret = null) {
     const response = await fetch(
       `${API_BASE}/api/conversations/${conversationId}/message/stream`,
       {
         method: 'POST',
-        headers: getHeaders(),
+        headers: getHeaders(sharedSecret),
         body: JSON.stringify({ content }),
       }
     );

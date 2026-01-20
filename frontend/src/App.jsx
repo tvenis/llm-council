@@ -9,6 +9,10 @@ function App() {
   const [currentConversationId, setCurrentConversationId] = useState(null);
   const [currentConversation, setCurrentConversation] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [sharedSecret, setSharedSecret] = useState(() => {
+    // Load from localStorage if available
+    return localStorage.getItem('llm_council_shared_secret') || '';
+  });
 
   // Load conversations on mount
   useEffect(() => {
@@ -22,9 +26,18 @@ function App() {
     }
   }, [currentConversationId]);
 
+  // Save shared secret to localStorage when it changes
+  useEffect(() => {
+    if (sharedSecret) {
+      localStorage.setItem('llm_council_shared_secret', sharedSecret);
+    } else {
+      localStorage.removeItem('llm_council_shared_secret');
+    }
+  }, [sharedSecret]);
+
   const loadConversations = async () => {
     try {
-      const convs = await api.listConversations();
+      const convs = await api.listConversations(sharedSecret || null);
       setConversations(convs);
     } catch (error) {
       console.error('Failed to load conversations:', error);
@@ -33,7 +46,7 @@ function App() {
 
   const loadConversation = async (id) => {
     try {
-      const conv = await api.getConversation(id);
+      const conv = await api.getConversation(id, sharedSecret || null);
       setCurrentConversation(conv);
     } catch (error) {
       console.error('Failed to load conversation:', error);
@@ -42,7 +55,7 @@ function App() {
 
   const handleNewConversation = async () => {
     try {
-      const newConv = await api.createConversation();
+      const newConv = await api.createConversation(sharedSecret || null);
       setConversations([
         { id: newConv.id, created_at: newConv.created_at, message_count: 0 },
         ...conversations,
@@ -89,7 +102,7 @@ function App() {
         messages: [...prev.messages, assistantMessage],
       }));
 
-      // Send message with streaming
+      // Send message with streaming (pass sharedSecret as 4th parameter)
       await api.sendMessageStream(currentConversationId, content, (eventType, event) => {
         switch (eventType) {
           case 'stage1_start':
@@ -169,7 +182,7 @@ function App() {
           default:
             console.log('Unknown event type:', eventType);
         }
-      });
+      }, sharedSecret || null);
     } catch (error) {
       console.error('Failed to send message:', error);
       // Remove optimistic messages on error
@@ -193,6 +206,8 @@ function App() {
         conversation={currentConversation}
         onSendMessage={handleSendMessage}
         isLoading={isLoading}
+        sharedSecret={sharedSecret}
+        onSharedSecretChange={setSharedSecret}
       />
     </div>
   );

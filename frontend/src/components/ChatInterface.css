@@ -109,6 +109,35 @@
   background: #fafafa;
 }
 
+.input-fields {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.secret-input {
+  padding: 12px 14px;
+  background: #ffffff;
+  border: 1px solid #d0d0d0;
+  border-radius: 8px;
+  color: #333;
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+}
+
+.secret-input:focus {
+  border-color: #4a90e2;
+  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+}
+
+.secret-input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: #f5f5f5;
+}
+
 .message-input {
   flex: 1;
   padding: 14px;
