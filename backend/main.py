@@ -14,10 +14,22 @@ from .council import run_full_council, generate_conversation_title, stage1_colle
 
 app = FastAPI(title="LLM Council API")
 
-# Enable CORS for local development
+# Enable CORS for local development and production
+import os
+cors_origins = [
+    "http://localhost:5173",
+    "http://localhost:3000",
+]
+# Add Railway production URL if provided
+if "RAILWAY_PUBLIC_DOMAIN" in os.environ:
+    cors_origins.append(f"https://{os.environ['RAILWAY_PUBLIC_DOMAIN']}")
+# Allow all origins in production if needed (can be restricted later)
+if os.getenv("ENVIRONMENT") == "production":
+    cors_origins.append("*")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:3000"],
+    allow_origins=cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
