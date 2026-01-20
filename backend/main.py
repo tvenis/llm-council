@@ -1,15 +1,16 @@
 """FastAPI backend for LLM Council."""
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Header, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 import uuid
 import json
 import asyncio
 
 from . import storage
+from .config import SHARED_SECRET
 from .council import run_full_council, generate_conversation_title, stage1_collect_responses, stage2_collect_rankings, stage3_synthesize_final, calculate_aggregate_rankings
 
 app = FastAPI(title="LLM Council API")
@@ -32,8 +33,32 @@ app.add_middleware(
     allow_origins=cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["*"],
+    allow_headers=["*", "X-Shared-Secret"],  # Allow shared secret header
 )
+
+
+def verify_shared_secret(x_shared_secret: Optional[str] = Header(None, alias="X-Shared-Secret")):
+    """
+    Dependency to verify shared secret for protected endpoints.
+    If no secret is configured, skip verification (for development).
+    """
+    if SHARED_SECRET is None:
+        # No secret configured, allow access (for local development)
+        return True
+    
+    if x_shared_secret is None:
+        raise HTTPException(
+            status_code=401,
+            detail="Missing shared secret. Please provide X-Shared-Secret header."
+        )
+    
+    if x_shared_secret != SHARED_SECRET:
+        raise HTTPException(
+            status_code=403,
+            detail="Invalid shared secret."
+        )
+    
+    return True
 
 
 class CreateConversationRequest(BaseModel):
@@ -69,13 +94,13 @@ async def root():
 
 
 @app.get("/api/conversations", response_model=List[ConversationMetadata])
-async def list_conversations():
+async def list_conversations(_: bool = Depends(verify_shared_secret)):
     """List all conversations (metadata only)."""
     return storage.list_conversations()
 
 
 @app.post("/api/conversations", response_model=Conversation)
-async def create_conversation(request: CreateConversationRequest):
+async def create_conversation(request: CreateConversationRequest, _: bool = Depends(verify_shared_secret)):
     """Create a new conversation."""
     conversation_id = str(uuid.uuid4())
     conversation = storage.create_conversation(conversation_id)
@@ -83,7 +108,7 @@ async def create_conversation(request: CreateConversationRequest):
 
 
 @app.get("/api/conversations/{conversation_id}", response_model=Conversation)
-async def get_conversation(conversation_id: str):
+async def get_conversation(conversation_id: str, _: bool = Depends(verify_shared_secret)):
     """Get a specific conversation with all its messages."""
     conversation = storage.get_conversation(conversation_id)
     if conversation is None:
@@ -92,7 +117,7 @@ async def get_conversation(conversation_id: str):
 
 
 @app.post("/api/conversations/{conversation_id}/message")
-async def send_message(conversation_id: str, request: SendMessageRequest):
+async def send_message(conversation_id: str, request: SendMessageRequest, _: bool = Depends(verify_shared_secret)):
     """
     Send a message and run the 3-stage council process.
     Returns the complete response with all stages.
@@ -136,7 +161,7 @@ async def send_message(conversation_id: str, request: SendMessageRequest):
 
 
 @app.post("/api/conversations/{conversation_id}/message/stream")
-async def send_message_stream(conversation_id: str, request: SendMessageRequest):
+async def send_message_stream(conversation_id: str, request: SendMessageRequest, _: bool = Depends(verify_shared_secret)):
     """
     Send a message and stream the 3-stage council process.
     Returns Server-Sent Events as each stage completes.

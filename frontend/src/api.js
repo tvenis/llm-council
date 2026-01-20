@@ -2,14 +2,28 @@
  * API client for the LLM Council backend.
  */
 
-const API_BASE = 'http://localhost:8001';
+const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:8001';
+const SHARED_SECRET = import.meta.env.VITE_SHARED_SECRET || '';
+
+// Helper function to get headers with shared secret
+function getHeaders() {
+  const headers = {
+    'Content-Type': 'application/json',
+  };
+  if (SHARED_SECRET) {
+    headers['X-Shared-Secret'] = SHARED_SECRET;
+  }
+  return headers;
+}
 
 export const api = {
   /**
    * List all conversations.
    */
   async listConversations() {
-    const response = await fetch(`${API_BASE}/api/conversations`);
+    const response = await fetch(`${API_BASE}/api/conversations`, {
+      headers: getHeaders(),
+    });
     if (!response.ok) {
       throw new Error('Failed to list conversations');
     }
@@ -22,9 +36,7 @@ export const api = {
   async createConversation() {
     const response = await fetch(`${API_BASE}/api/conversations`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: getHeaders(),
       body: JSON.stringify({}),
     });
     if (!response.ok) {
@@ -38,7 +50,10 @@ export const api = {
    */
   async getConversation(conversationId) {
     const response = await fetch(
-      `${API_BASE}/api/conversations/${conversationId}`
+      `${API_BASE}/api/conversations/${conversationId}`,
+      {
+        headers: getHeaders(),
+      }
     );
     if (!response.ok) {
       throw new Error('Failed to get conversation');
@@ -54,9 +69,7 @@ export const api = {
       `${API_BASE}/api/conversations/${conversationId}/message`,
       {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: getHeaders(),
         body: JSON.stringify({ content }),
       }
     );
@@ -78,9 +91,7 @@ export const api = {
       `${API_BASE}/api/conversations/${conversationId}/message/stream`,
       {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: getHeaders(),
         body: JSON.stringify({ content }),
       }
     );

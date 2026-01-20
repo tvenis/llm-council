@@ -8,6 +8,9 @@ load_dotenv()
 # OpenRouter API key
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 
+# Shared secret for API access protection
+SHARED_SECRET = os.getenv("SHARED_SECRET")
+
 # Council members - list of OpenRouter model identifiers
 COUNCIL_MODELS = [
     "openai/gpt-5.2",

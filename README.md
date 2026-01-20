@@ -38,9 +38,19 @@ Create a `.env` file in the project root:
 
 ```bash
 OPENROUTER_API_KEY=sk-or-v1-...
+SHARED_SECRET=your-secret-key-here
 ```
 
 Get your API key at [openrouter.ai](https://openrouter.ai/). Make sure to purchase the credits you need, or sign up for automatic top up.
+
+**Frontend:** Create a `.env` file in the `frontend/` directory (or copy `.env.example`):
+
+```bash
+VITE_API_BASE=http://localhost:8001
+VITE_SHARED_SECRET=your-secret-key-here
+```
+
+The `SHARED_SECRET` must match between backend and frontend `.env` files. This provides simple API protection to prevent unauthorized access to your OpenRouter API. If `SHARED_SECRET` is not set, the API will be accessible without authentication (useful for local development).
 
 ### 3. Configure Models (Optional)
 
