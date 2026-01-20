@@ -29,7 +29,7 @@
   "deploy": {
     "inputs": [
       { "step": "build" },
-      { "local": true, "include": ["backend/", "main.py", "frontend/dist/"] }
+      { "local": true, "include": ["backend/", "main.py"] }
     ]
   }
 }
