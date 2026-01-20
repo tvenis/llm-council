@@ -2,7 +2,10 @@
  * API client for the LLM Council backend.
  */
 
-const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:8001';
+// Use environment variable if set, otherwise use current origin (for production)
+// or localhost for development
+const API_BASE = import.meta.env.VITE_API_BASE || 
+  (import.meta.env.PROD ? '' : 'http://localhost:8001');
 
 // Helper function to get headers with shared secret
 function getHeaders(sharedSecret) {

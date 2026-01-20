@@ -2,12 +2,15 @@
 
 from fastapi import FastAPI, HTTPException, Header, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from typing import List, Dict, Any, Optional
 import uuid
 import json
 import asyncio
+import os
+from pathlib import Path
 
 from . import storage
 from .config import SHARED_SECRET
@@ -87,9 +90,23 @@ class Conversation(BaseModel):
     messages: List[Dict[str, Any]]
 
 
+# Serve static files from frontend build if it exists
+frontend_dist = Path(__file__).parent.parent / "frontend" / "dist"
+if frontend_dist.exists():
+    app.mount("/assets", StaticFiles(directory=str(frontend_dist / "assets")), name="assets")
+    # Serve other static files (favicon, etc.)
+    static_files = StaticFiles(directory=str(frontend_dist))
+    app.mount("/static", static_files, name="static")
+
+
 @app.get("/")
 async def root():
-    """Health check endpoint."""
+    """Serve frontend index.html or health check."""
+    # If frontend is built, serve it
+    index_file = frontend_dist / "index.html"
+    if index_file.exists():
+        return FileResponse(str(index_file))
+    # Otherwise return health check
     return {"status": "ok", "service": "LLM Council API"}
 
 
@@ -229,6 +246,22 @@ async def send_message_stream(conversation_id: str, request: SendMessageRequest,
             "Connection": "keep-alive",
         }
     )
+
+
+# Catch-all route for SPA routing (must be last, after all API routes)
+@app.get("/{full_path:path}")
+async def serve_spa(full_path: str):
+    """Serve frontend for SPA routing, or 404 if not found."""
+    # Don't interfere with API routes
+    if full_path.startswith("api/"):
+        raise HTTPException(status_code=404, detail="API endpoint not found")
+    
+    # Serve index.html for all other routes (SPA routing)
+    index_file = frontend_dist / "index.html"
+    if index_file.exists():
+        return FileResponse(str(index_file))
+    
+    raise HTTPException(status_code=404, detail="Not found")
 
 
 if __name__ == "__main__":
