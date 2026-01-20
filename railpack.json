@@ -18,7 +18,7 @@
     "build": {
       "inputs": [
         { "step": "install" },
-        { "local": true, "include": ["frontend/**"] }
+        { "local": true, "include": ["frontend/"] }
       ],
       "commands": [
         "cd frontend && npm run build"
