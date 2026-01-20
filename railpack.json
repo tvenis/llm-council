@@ -28,8 +28,12 @@
   },
   "deploy": {
     "inputs": [
+      { "step": "install", "include": ["/app/.venv"] },
       { "step": "build" },
-      { "local": true, "include": ["backend/", "main.py"] }
+      { "local": true, "include": ["backend/", "main.py", "requirements.txt"] }
+    ],
+    "commands": [
+      "/app/.venv/bin/pip install -r requirements.txt"
     ]
   }
 }
