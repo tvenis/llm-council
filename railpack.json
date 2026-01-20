@@ -1,12 +1,21 @@
 {
-  "setup": {
-    "nixPkgs": ["nodejs-18_x"]
+  "$schema": "https://schema.railpack.com",
+  "packages": {
+    "node": "18",
+    "python": "3.10"
   },
-  "install": [
-    "cd frontend && npm ci",
-    "pip install -r requirements.txt"
-  ],
-  "build": [
-    "cd frontend && npm run build"
-  ]
+  "steps": {
+    "install": {
+      "commands": [
+        "cd frontend && npm ci",
+        "pip install -r requirements.txt"
+      ]
+    },
+    "build": {
+      "inputs": [{"step": "install"}],
+      "commands": [
+        "cd frontend && npm run build"
+      ]
+    }
+  }
 }
