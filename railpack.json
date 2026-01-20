@@ -8,7 +8,7 @@
     "install": {
       "inputs": [
         "...",
-        { "local": true, "include": ["frontend/package.json", "frontend/package-lock.json"], "dest": "frontend/" }
+        { "local": true, "include": ["frontend/"] }
       ],
       "commands": [
         "cd frontend && npm ci",
@@ -18,7 +18,7 @@
     "build": {
       "inputs": [
         { "step": "install" },
-        { "local": true, "include": ["frontend/**"], "dest": "frontend/" }
+        { "local": true, "include": ["frontend/**"] }
       ],
       "commands": [
         "cd frontend && npm run build"
