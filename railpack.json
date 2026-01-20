@@ -1,14 +1,14 @@
 {
   "$schema": "https://schema.railpack.com",
   "packages": {
-    "node": "18",
+    "node": "20",
     "python": "3.10"
   },
   "steps": {
     "install": {
       "inputs": [
         "...",
-        { "local": true, "include": ["frontend/"] }
+        { "local": true, "include": ["frontend/", "requirements.txt"] }
       ],
       "commands": [
         "cd frontend && npm ci",
