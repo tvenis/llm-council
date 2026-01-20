@@ -7,16 +7,14 @@
   "steps": {
     "install": {
       "commands": [
-        "ls -la",
-        "pwd",
-        "[ -d frontend ] && (cd frontend && npm ci) || (echo 'Frontend directory not found, skipping npm install')",
+        "if [ -d frontend ]; then cd frontend && npm ci; else echo 'Frontend directory not found'; fi",
         "pip install -r requirements.txt"
       ]
     },
     "build": {
       "inputs": [{"step": "install"}],
       "commands": [
-        "[ -d frontend ] && (cd frontend && npm run build) || (echo 'Frontend directory not found, skipping build')"
+        "if [ -d frontend ]; then cd frontend && npm run build; else echo 'Frontend directory not found'; fi"
       ]
     }
   }
