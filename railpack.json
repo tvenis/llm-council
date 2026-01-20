@@ -8,7 +8,7 @@
     "install": {
       "inputs": [
         "...",
-        { "local": true, "include": ["frontend/", "requirements.txt"] }
+        { "local": true, "include": ["frontend/", "requirements.txt", "backend/", "main.py"] }
       ],
       "commands": [
         "cd frontend && npm ci",
@@ -25,5 +25,11 @@
         "cd frontend && npm run build"
       ]
     }
+  },
+  "deploy": {
+    "inputs": [
+      { "step": "build" },
+      { "local": true, "include": ["backend/", "main.py", "frontend/dist/"] }
+    ]
   }
 }
