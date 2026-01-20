@@ -1,0 +1,12 @@
+{
+  "setup": {
+    "nixPkgs": ["nodejs-18_x"]
+  },
+  "install": [
+    "cd frontend && npm ci",
+    "pip install -r requirements.txt"
+  ],
+  "build": [
+    "cd frontend && npm run build"
+  ]
+}
