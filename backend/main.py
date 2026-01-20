@@ -90,22 +90,47 @@ class Conversation(BaseModel):
     messages: List[Dict[str, Any]]
 
 
+# Find frontend dist directory
+def find_frontend_dist():
+    """Find the frontend dist directory, trying multiple paths."""
+    base_paths = [
+        Path(__file__).parent.parent / "frontend" / "dist",  # Relative to this file
+        Path("/app/frontend/dist"),  # Railway absolute path
+        Path("./frontend/dist"),  # Current directory
+        Path("../frontend/dist"),  # Parent directory
+    ]
+    
+    for path in base_paths:
+        if path.exists():
+            print(f"Found frontend dist at: {path}")
+            return path
+    
+    print(f"WARNING: Frontend dist not found. Tried: {base_paths}")
+    return None
+
+frontend_dist = find_frontend_dist()
+
 # Serve static files from frontend build if it exists
-frontend_dist = Path(__file__).parent.parent / "frontend" / "dist"
-if frontend_dist.exists():
-    app.mount("/assets", StaticFiles(directory=str(frontend_dist / "assets")), name="assets")
+if frontend_dist:
+    # Check for assets directory
+    assets_dir = frontend_dist / "assets"
+    if assets_dir.exists():
+        app.mount("/assets", StaticFiles(directory=str(assets_dir)), name="assets")
+        print(f"Mounted /assets from: {assets_dir}")
     # Serve other static files (favicon, etc.)
     static_files = StaticFiles(directory=str(frontend_dist))
     app.mount("/static", static_files, name="static")
+    print(f"Mounted /static from: {frontend_dist}")
 
 
 @app.get("/")
 async def root():
     """Serve frontend index.html or health check."""
     # If frontend is built, serve it
-    index_file = frontend_dist / "index.html"
-    if index_file.exists():
-        return FileResponse(str(index_file))
+    if frontend_dist:
+        index_file = frontend_dist / "index.html"
+        if index_file.exists():
+            return FileResponse(str(index_file))
     # Otherwise return health check
     return {"status": "ok", "service": "LLM Council API"}
 
@@ -257,9 +282,10 @@ async def serve_spa(full_path: str):
         raise HTTPException(status_code=404, detail="API endpoint not found")
     
     # Serve index.html for all other routes (SPA routing)
-    index_file = frontend_dist / "index.html"
-    if index_file.exists():
-        return FileResponse(str(index_file))
+    if frontend_dist:
+        index_file = frontend_dist / "index.html"
+        if index_file.exists():
+            return FileResponse(str(index_file))
     
     raise HTTPException(status_code=404, detail="Not found")
 
