@@ -162,10 +162,13 @@ Provide a clear, well-reasoned final answer that represents the council's collec
     response = await query_model(CHAIRMAN_MODEL, messages)
 
     if response is None:
-        # Fallback if chairman fails
+        # Fallback if chairman fails - include helpful error message
+        import sys
+        error_detail = "The chairman model failed to respond. This could be due to:\n- API rate limiting\n- Model availability issues\n- Network connectivity problems\n- Invalid model identifier\n\nPlease check the backend logs for more details."
+        sys.stderr.write(f"Chairman model {CHAIRMAN_MODEL} failed to respond.\n")
         return {
             "model": CHAIRMAN_MODEL,
-            "response": "Error: Unable to generate final synthesis."
+            "response": f"Error: Unable to generate final synthesis.\n\n{error_detail}"
         }
 
     return {
