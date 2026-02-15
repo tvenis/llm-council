@@ -12,7 +12,7 @@
       ],
       "commands": [
         "cd frontend && npm ci",
-        "python -m venv /app/.venv",
+        "python3 -m venv /app/.venv",
         "/app/.venv/bin/pip install -r requirements.txt"
       ]
     },
@@ -34,6 +34,6 @@
     "commands": [
       "pip install -r requirements.txt"
     ],
-    "startCommand": "python -m uvicorn backend.main:app --host 0.0.0.0 --port $PORT"
+    "startCommand": "python3 -m uvicorn backend.main:app --host 0.0.0.0 --port $PORT"
   }
 }
