@@ -12,8 +12,7 @@
       ],
       "commands": [
         "cd frontend && npm ci",
-        "python3 -m venv /app/.venv",
-        "/app/.venv/bin/pip install -r requirements.txt"
+        "pip install --user -r requirements.txt"
       ]
     },
     "build": {
@@ -28,12 +27,10 @@
   },
   "deploy": {
     "inputs": [
+      { "step": "install" },
       { "step": "build" },
-      { "local": true, "include": ["backend/", "main.py", "requirements.txt"] }
+      { "local": true, "include": ["backend/", "main.py"] }
     ],
-    "commands": [
-      "/app/.venv/bin/pip install -r requirements.txt"
-    ],
-    "startCommand": "/app/.venv/bin/python -m uvicorn backend.main:app --host 0.0.0.0 --port $PORT"
+    "startCommand": "uvicorn backend.main:app --host 0.0.0.0 --port $PORT"
   }
 }
