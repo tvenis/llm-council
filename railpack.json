@@ -2,7 +2,8 @@
   "$schema": "https://schema.railpack.com",
   "packages": {
     "node": "20",
-    "python": "3.10"
+    "python": "3.10",
+    "pip": "*"
   },
   "steps": {
     "install": {
@@ -11,8 +12,7 @@
         { "local": true, "include": ["frontend/", "requirements.txt", "backend/", "main.py"] }
       ],
       "commands": [
-        "cd frontend && npm ci",
-        "pip install --user -r requirements.txt"
+        "cd frontend && npm ci"
       ]
     },
     "build": {
@@ -27,10 +27,12 @@
   },
   "deploy": {
     "inputs": [
-      { "step": "install" },
       { "step": "build" },
-      { "local": true, "include": ["backend/", "main.py"] }
+      { "local": true, "include": ["backend/", "main.py", "requirements.txt"] }
     ],
-    "startCommand": "uvicorn backend.main:app --host 0.0.0.0 --port $PORT"
+    "commands": [
+      "pip install -r requirements.txt"
+    ],
+    "startCommand": "python -m uvicorn backend.main:app --host 0.0.0.0 --port $PORT"
   }
 }
