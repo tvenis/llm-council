@@ -32,8 +32,8 @@
       { "local": true, "include": ["backend/", "main.py", "requirements.txt"] }
     ],
     "commands": [
-      "pip install -r requirements.txt"
+      "/app/.venv/bin/pip install -r requirements.txt"
     ],
-    "startCommand": "python3 -m uvicorn backend.main:app --host 0.0.0.0 --port $PORT"
+    "startCommand": "/app/.venv/bin/python -m uvicorn backend.main:app --host 0.0.0.0 --port $PORT"
   }
 }
