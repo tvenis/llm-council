@@ -56,6 +56,20 @@ export default function ChatInterface({
           <h2>Welcome to LLM Council</h2>
           <p>Create a new conversation to get started</p>
         </div>
+        <form className="input-form" onSubmit={(e) => e.preventDefault()}>
+          <div className="input-fields">
+            <input
+              type="password"
+              className="secret-input"
+              placeholder="Shared Secret (required for API access)"
+              value={secretInput}
+              onChange={(e) => {
+                setSecretInput(e.target.value);
+                onSharedSecretChange(e.target.value);
+              }}
+            />
+          </div>
+        </form>
       </div>
     );
   }
