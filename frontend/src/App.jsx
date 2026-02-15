@@ -10,8 +10,8 @@ function App() {
   const [currentConversation, setCurrentConversation] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [sharedSecret, setSharedSecret] = useState(() => {
-    // Load from localStorage if available
-    return localStorage.getItem('llm_council_shared_secret') || '';
+    // Load from env var first, then localStorage
+    return import.meta.env.VITE_SHARED_SECRET || localStorage.getItem('llm_council_shared_secret') || '';
   });
 
   // Load conversations on mount
