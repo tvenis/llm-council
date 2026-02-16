@@ -6,6 +6,29 @@
   background: #ffffff;
 }
 
+.secret-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 24px;
+  background: #f5f5f5;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.secret-header label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #666;
+  white-space: nowrap;
+}
+
+.secret-header .secret-input {
+  flex: 1;
+  max-width: 300px;
+  padding: 8px 12px;
+  font-size: 13px;
+}
+
 .messages-container {
   flex: 1;
   overflow-y: auto;

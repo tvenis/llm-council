@@ -49,38 +49,42 @@ export default function ChatInterface({
     }
   };
 
+  const secretHeader = (
+    <div className="secret-header">
+      <label>Shared Secret:</label>
+      <input
+        type="password"
+        className="secret-input"
+        placeholder="Enter shared secret for API access"
+        value={secretInput}
+        onChange={(e) => {
+          setSecretInput(e.target.value);
+          onSharedSecretChange(e.target.value);
+        }}
+      />
+    </div>
+  );
+
   if (!conversation) {
     return (
       <div className="chat-interface">
+        {secretHeader}
         <div className="empty-state">
-          <h2>Welcome to LLM Council</h2>
+          <h2>Welcome to LLM BOD</h2>
           <p>Create a new conversation to get started</p>
         </div>
-        <form className="input-form" onSubmit={(e) => e.preventDefault()}>
-          <div className="input-fields">
-            <input
-              type="password"
-              className="secret-input"
-              placeholder="Shared Secret (required for API access)"
-              value={secretInput}
-              onChange={(e) => {
-                setSecretInput(e.target.value);
-                onSharedSecretChange(e.target.value);
-              }}
-            />
-          </div>
-        </form>
       </div>
     );
   }
 
   return (
     <div className="chat-interface">
+      {secretHeader}
       <div className="messages-container">
         {conversation.messages.length === 0 ? (
           <div className="empty-state">
             <h2>Start a conversation</h2>
-            <p>Ask a question to consult the LLM Council</p>
+            <p>Ask a question to consult the LLM BOD</p>
           </div>
         ) : (
           conversation.messages.map((msg, index) => (
@@ -96,7 +100,7 @@ export default function ChatInterface({
                 </div>
               ) : (
                 <div className="assistant-message">
-                  <div className="message-label">LLM Council</div>
+                  <div className="message-label">LLM BOD</div>
 
                   {/* Stage 1 */}
                   {msg.loading?.stage1 && (
@@ -148,14 +152,6 @@ export default function ChatInterface({
 
       <form className="input-form" onSubmit={handleSubmit}>
         <div className="input-fields">
-          <input
-            type="password"
-            className="secret-input"
-            placeholder="Shared Secret (required for API access)"
-            value={secretInput}
-            onChange={(e) => setSecretInput(e.target.value)}
-            disabled={isLoading}
-          />
           <textarea
             className="message-input"
             placeholder="Ask your question... (Shift+Enter for new line, Enter to send)"
