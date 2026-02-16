@@ -21,6 +21,9 @@ COPY main.py ./
 # Copy built frontend
 COPY --from=frontend-build /app/frontend/dist ./frontend/dist
 
+# Create data directory for conversation storage
+RUN mkdir -p /app/data/conversations
+
 # Railway uses PORT env var
 ENV PORT=8080
 EXPOSE 8080
