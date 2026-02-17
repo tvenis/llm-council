@@ -60,7 +60,7 @@ Edit `backend/config.py` to customize the council:
 COUNCIL_MODELS = [
     "openai/gpt-5.1",
     "google/gemini-3-pro-preview",
-    "anthropic/claude-sonnet-4.5",
+    "anthropic/claude-sonnet-4.6",
     "x-ai/grok-4",
 ]
 

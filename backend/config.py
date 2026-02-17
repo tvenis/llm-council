@@ -15,7 +15,7 @@ SHARED_SECRET = os.getenv("SHARED_SECRET")
 COUNCIL_MODELS = [
     "openai/gpt-5.2",
     "google/gemini-3-pro-preview",
-    "anthropic/claude-sonnet-4.5",
+    "anthropic/claude-sonnet-4.6",
     "deepseek/deepseek-v3.2",
 ]
 
